@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+{% block content %}
+<h1 class="text-2xl font-bold mb-6">Dashboard</h1>
+
+<div class="grid grid-cols-3 gap-4 mb-8">
+  <div class="bg-green-100 p-4 rounded shadow text-center">
+    <h2 class="text-lg font-semibold">Total Income</h2>
+    <p class="text-2xl font-bold text-green-700">Ksh {{ total_income }}</p>
+  </div>
+  <div class="bg-red-100 p-4 rounded shadow text-center">
+    <h2 class="text-lg font-semibold">Total Expense</h2>
+    <p class="text-2xl font-bold text-red-700">Ksh {{ total_expense }}</p>
+  </div>
+  <div class="bg-blue-100 p-4 rounded shadow text-center">
+    <h2 class="text-lg font-semibold">Balance</h2>
+    <p class="text-2xl font-bold text-blue-700">Ksh {{ balance }}</p>
+  </div>
+</div>
+
+<v class="bg-white p-6 rounded shadow mb-8">
+  <h2 class="text-xl font-bold mb-4">Spending Overview (Pie Chart)</h2>
+  <div class="flex justify-center">
+  <canvas id="pieChart" class="max-w-[500px] max-h-[500px]"></canvas>
+  </div>
+</div>
+
+<div class="bg-white p-6 rounded shadow">
+  <h2 class="text-xl font-bold mb-4">Income vs Expense Trend (Line Graph)</h2>
+  <canvas id="lineChart"></canvas>
+</div>
+
+<script>
+  // --- PIE CHART ---
+  const pieCtx = document.getElementById("pieChart").getContext("2d");
+  new Chart(pieCtx, {
+    type: "pie",
+    data: {
+      labels: ["Income", "Expense"],
+      datasets: [{
+        data: [
+          JSON.parse('{{ total_income | tojson }}'),
+          JSON.parse('{{ total_expense | tojson }}')
+        ],
+        backgroundColor: ["#16a34a", "#dc2626"]
+      }]
+    }
+  });
+
+  // --- LINE CHART ---
+  const incomeDates = JSON.parse('{{ income_data | map(attribute="Date") | list | tojson | safe }}');
+  const incomeAmounts = JSON.parse('{{ income_data | map(attribute="Amount") | list | tojson | safe }}');
+  const expenseAmounts = JSON.parse('{{ expense_data | map(attribute="Amount") | list | tojson | safe }}');
+
+  const lineCtx = document.getElementById("lineChart").getContext("2d");
+  new Chart(lineCtx, {
+    type: "line",
+    data: {
+      labels: incomeDates,
+      datasets: [
+        {
+          label: "Income",
+          data: incomeAmounts,
+          borderColor: "#16a34a",
+          borderWidth: 2,
+          fill: false,
+          tension: 0.3
+        },
+        {
+          label: "Expense",
+          data: expenseAmounts,
+          borderColor: "#dc2626",
+          borderWidth: 2,
+          fill: false,
+          tension: 0.3
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      interaction: { mode: "index", intersect: false },
+      scales: {
+        x: { title: { display: true, text: "Date" } },
+        y: { title: { display: true, text: "Amount" }, beginAtZero: true }
+      }
+    }
+  });
+</script>
+{% endblock %}

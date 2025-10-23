@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Expense Tracker</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body class="bg-gray-100">
+  <nav class="bg-blue-600 text-white px-6 py-3 flex justify-between">
+    <div class="font-bold">Expense Tracker</div>
+    <div class="space-x-4">
+      <a href="{{ url_for('dashboard') }}" class="hover:underline">Dashboard</a>
+      <a href="{{ url_for('income') }}" class="hover:underline">Income</a>
+      <a href="{{ url_for('expense') }}" class="hover:underline">Expense</a>
+    </div>
+  </nav>
+  <div class="p-6">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div class="p-3 mb-4 rounded text-white {% if category == 'success' %}bg-green-500{% elif category == 'warning' %}bg-yellow-500{% else %}bg-red-500{% endif %}">
+            {{ message }}
+          </div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+    {% block content %}{% endblock %}
+  </div>
+</body>
+</html>
+
