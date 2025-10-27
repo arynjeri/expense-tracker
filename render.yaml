@@ -1,0 +1,6 @@
+services:
+  - type: web
+    name: expense-tracker
+    env: python
+    startCommand: gunicorn app:app
+    buildCommand: pip install -r requirements.txt
